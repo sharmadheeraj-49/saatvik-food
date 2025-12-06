@@ -77,7 +77,7 @@ Create a menu page for Saatvik Food with:
     </div>
 
     <!-- Cart Summary (Fixed) -->
-    <div class="fixed bottom-0 right-0 m-4 w-80 bg-white shadow-lg rounded-lg p-6 border-t-4 border-green-600">
+    <div class="fixed bottom-0 right-0 m-4 w-80 bg-white shadow-lg rounded-lg p-6 border-t-4 border-orange-600">
         <h3 class="text-2xl font-bold mb-4">Cart</h3>
         <div id="cartItems" class="mb-4 max-h-48 overflow-y-auto">
             <p class="text-gray-500">Your cart is empty</p>
@@ -86,20 +86,20 @@ Create a menu page for Saatvik Food with:
             <p class="text-lg font-semibold">Total: ₹<span id="cartTotal">0</span></p>
             <p class="text-sm text-gray-600">Items: <span id="cartCount">0</span></p>
         </div>
-        <button id="orderBtn" class="w-full bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 disabled:bg-gray-400" disabled>Place Order</button>
+        <button id="orderBtn" class="w-full bg-orange-600 text-white py-2 rounded-lg font-semibold hover:bg-orange-700 disabled:bg-gray-400" disabled>Place Order</button>
     </div>
 
     <script>
         const foodData = [
-            { id: 1, nameHi: "दक्षिण भारतीय इडली", nameEn: "Idli", price: 40, meal: "breakfast", dietary: ["jain", "satvik"] },
-            { id: 2, nameHi: "मसाला डोसा", nameEn: "Masala Dosa", price: 60, meal: "breakfast", dietary: ["satvik"] },
-            { id: 3, nameHi: "खिचड़ी", nameEn: "Khichdi", price: 80, meal: "lunch", dietary: ["jain", "brahmacharya", "satvik"] },
-            { id: 4, nameHi: "दाल-बाटी", nameEn: "Dal Bati", price: 100, meal: "lunch", dietary: ["satvik"] },
-            { id: 5, nameHi: "शाकाहारी थाली", nameEn: "Vegetable Thali", price: 120, meal: "lunch", dietary: ["jain", "satvik"] },
-            { id: 6, nameHi: "साबूदाना खीर", nameEn: "Sabudana Kheer", price: 50, meal: "dinner", dietary: ["brahmacharya", "satvik"] },
-            { id: 7, nameHi: "लौकी की सब्जी", nameEn: "Bottle Gourd Curry", price: 70, meal: "dinner", dietary: ["jain", "satvik"] },
-            { id: 8, nameHi: "गुलाब जामुन", nameEn: "Gulab Jamun", price: 45, meal: "dessert", dietary: ["satvik"] },
-            { id: 9, nameHi: "खीर", nameEn: "Kheer", price: 55, meal: "dessert", dietary: ["brahmacharya", "satvik"] }
+            { id: 1, nameHi: "दक्षिण भारतीय इडली", nameEn: "Idli", price: 40, meal: "breakfast", dietary: ["jain", "satvik"], image: "images/idli.jpg" },
+            { id: 2, nameHi: "मसाला डोसा", nameEn: "Masala Dosa", price: 60, meal: "breakfast", dietary: ["satvik"], image: "images/dosa.jpg" },
+            { id: 3, nameHi: "खिचड़ी", nameEn: "Khichdi", price: 80, meal: "lunch", dietary: ["jain", "brahmacharya", "satvik"], image: "images/khichdi.jpg" },
+            { id: 4, nameHi: "दाल-बाटी", nameEn: "Dal Bati", price: 100, meal: "lunch", dietary: ["satvik"], image: "images/dal-bati.jpg" },
+            { id: 5, nameHi: "शाकाहारी थाली", nameEn: "Vegetable Thali", price: 120, meal: "lunch", dietary: ["jain", "satvik"], image: "images/thali.jpg" },
+            { id: 6, nameHi: "साबूदाना खीर", nameEn: "Sabudana Kheer", price: 50, meal: "dinner", dietary: ["brahmacharya", "satvik"], image: "images/sabudana-kheer.jpg" },
+            { id: 7, nameHi: "लौकी की सब्जी", nameEn: "Bottle Gourd Curry", price: 70, meal: "dinner", dietary: ["jain", "satvik"], image: "images/gourd-curry.jpg" },
+            { id: 8, nameHi: "गुलाब जामुन", nameEn: "Gulab Jamun", price: 45, meal: "dessert", dietary: ["satvik"], image: "images/gulab-jamun.jpg" },
+            { id: 9, nameHi: "खीर", nameEn: "Kheer", price: 55, meal: "dessert", dietary: ["brahmacharya", "satvik"], image: "images/kheer.jpg" }
         ];
 
         let cart = JSON.parse(localStorage.getItem("cart")) || [];
@@ -114,14 +114,17 @@ Create a menu page for Saatvik Food with:
 
             const grid = document.getElementById("foodGrid");
             grid.innerHTML = filtered.map(food => `
-                <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
-                    <h3 class="text-lg font-bold text-gray-800">${food.nameEn}</h3>
-                    <p class="text-gray-600 text-sm mb-2">${food.nameHi}</p>
-                    <p class="text-2xl font-bold text-green-600 mb-3">₹${food.price}</p>
-                    <div class="mb-4">
-                        ${food.dietary.map(d => `<span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded mr-1 mb-1">${d}</span>`).join("")}
+                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition">
+                    <img src="${food.image}" alt="${food.nameEn}" class="w-full h-48 object-cover">
+                    <div class="p-6">
+                        <h3 class="text-lg font-bold text-gray-800">${food.nameEn}</h3>
+                        <p class="text-gray-600 text-sm mb-2">${food.nameHi}</p>
+                        <p class="text-2xl font-bold text-orange-600 mb-3">₹${food.price}</p>
+                        <div class="mb-4">
+                            ${food.dietary.map(d => `<span class="inline-block bg-orange-100 text-orange-800 text-xs px-2 py-1 rounded mr-1 mb-1">${d}</span>`).join("")}
+                        </div>
+                        <button class="add-to-cart w-full bg-orange-600 text-white py-2 rounded-lg hover:bg-orange-700" data-id="${food.id}">Add to Cart</button>
                     </div>
-                    <button class="add-to-cart w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700" data-id="${food.id}">Add to Cart</button>
                 </div>
             `).join("");
         }
