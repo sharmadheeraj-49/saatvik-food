@@ -42,6 +42,36 @@ function getCartTotal() {
     return cart.reduce((total, item) => total + (item.price * item.quantity), 0);
 }
 
+// Mobile menu toggle
+function initMobileMenu() {
+    const menuButton = document.querySelector('button.md\\:hidden');
+    if (menuButton) {
+        menuButton.addEventListener('click', function() {
+            const navLinks = document.querySelector('.hidden.md\\:flex');
+            if (navLinks) {
+                navLinks.classList.toggle('hidden');
+            }
+        });
+    }
+}
+
+// Contact button functionality
+function initContactButton() {
+    const contactLinks = document.querySelectorAll('a[href="contact.html"]');
+    contactLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Navigation will happen automatically, but you can add additional logic here
+            console.log('Navigating to contact page');
+        });
+    });
+}
+
+// Initialize all event listeners when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    initMobileMenu();
+    initContactButton();
+});
+
 // Checkout
 function checkout() {
     if (cart.length === 0) {
