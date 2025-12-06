@@ -1,0 +1,18 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom component styles */
+@layer components {
+  .btn-primary {
+    @apply px-6 py-3 bg-saatvik-600 text-white rounded-lg hover:bg-saatvik-700 transition-colors;
+  }
+  
+  .menu-card {
+    @apply bg-white rounded-lg shadow-lg p-6 hover:shadow-xl transition-shadow;
+  }
+  
+  .cart-button {
+    @apply w-full py-2 bg-red-600 text-white rounded hover:bg-red-700;
+  }
+}

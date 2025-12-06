@@ -1,0 +1,184 @@
+<!--
+Create a menu page for Saatvik Food with:
+- Filter buttons for meal type (breakfast, lunch, dinner, dessert)
+- Filter buttons for dietary type (jain, brahmacharya, satvik)
+- Grid of food cards showing:
+  * Food name in Hindi and English
+  * Price
+  * Dietary icons
+  * Add to cart button
+- Fixed cart summary at bottom right showing:
+  * Items in cart
+  * Total price
+  * Order button
+- Cart data stored in browser's LocalStorage (no backend)
+- Use Tailwind CSS
+- Interactive JavaScript for filtering and cart
+-->
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Saatvik Food Menu</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50">
+    <div class="container mx-auto px-4 py-8 pb-32">
+        <h1 class="text-4xl font-bold text-center mb-8 text-green-700">Saatvik Food Menu</h1>
+        
+        <!-- Filters -->
+        <div class="mb-8">
+            <h2 class="text-xl font-semibold mb-4">Meal Type</h2>
+            <div class="flex gap-2 flex-wrap mb-6">
+                <button class="filter-btn px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-green-500" data-filter="meal" data-value="all">All</button>
+                <button class="filter-btn px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-green-500" data-filter="meal" data-value="breakfast">Breakfast</button>
+                <button class="filter-btn px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-green-500" data-filter="meal" data-value="lunch">Lunch</button>
+                <button class="filter-btn px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-green-500" data-filter="meal" data-value="dinner">Dinner</button>
+                <button class="filter-btn px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-green-500" data-filter="meal" data-value="dessert">Dessert</button>
+            </div>
+            
+            <h2 class="text-xl font-semibold mb-4">Dietary Type</h2>
+            <div class="flex gap-2 flex-wrap">
+                <button class="filter-btn px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-green-500" data-filter="dietary" data-value="all">All</button>
+                <button class="filter-btn px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-green-500" data-filter="dietary" data-value="jain">Jain</button>
+                <button class="filter-btn px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-green-500" data-filter="dietary" data-value="brahmacharya">Brahmacharya</button>
+                <button class="filter-btn px-4 py-2 bg-white border-2 border-gray-300 rounded-lg hover:border-green-500" data-filter="dietary" data-value="satvik">Satvik</button>
+            </div>
+        </div>
+
+        <!-- Food Grid -->
+        <div id="foodGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- Food cards will be generated here -->
+        </div>
+    </div>
+
+    <!-- Cart Summary (Fixed) -->
+    <div class="fixed bottom-0 right-0 m-4 w-80 bg-white shadow-lg rounded-lg p-6 border-t-4 border-green-600">
+        <h3 class="text-2xl font-bold mb-4">Cart</h3>
+        <div id="cartItems" class="mb-4 max-h-48 overflow-y-auto">
+            <p class="text-gray-500">Your cart is empty</p>
+        </div>
+        <div class="border-t-2 pt-4 mb-4">
+            <p class="text-lg font-semibold">Total: ₹<span id="cartTotal">0</span></p>
+            <p class="text-sm text-gray-600">Items: <span id="cartCount">0</span></p>
+        </div>
+        <button id="orderBtn" class="w-full bg-green-600 text-white py-2 rounded-lg font-semibold hover:bg-green-700 disabled:bg-gray-400" disabled>Place Order</button>
+    </div>
+
+    <script>
+        const foodData = [
+            { id: 1, nameHi: "दक्षिण भारतीय इडली", nameEn: "Idli", price: 40, meal: "breakfast", dietary: ["jain", "satvik"] },
+            { id: 2, nameHi: "मसाला डोसा", nameEn: "Masala Dosa", price: 60, meal: "breakfast", dietary: ["satvik"] },
+            { id: 3, nameHi: "खिचड़ी", nameEn: "Khichdi", price: 80, meal: "lunch", dietary: ["jain", "brahmacharya", "satvik"] },
+            { id: 4, nameHi: "दाल-बाटी", nameEn: "Dal Bati", price: 100, meal: "lunch", dietary: ["satvik"] },
+            { id: 5, nameHi: "शाकाहारी थाली", nameEn: "Vegetable Thali", price: 120, meal: "lunch", dietary: ["jain", "satvik"] },
+            { id: 6, nameHi: "साबूदाना खीर", nameEn: "Sabudana Kheer", price: 50, meal: "dinner", dietary: ["brahmacharya", "satvik"] },
+            { id: 7, nameHi: "लौकी की सब्जी", nameEn: "Bottle Gourd Curry", price: 70, meal: "dinner", dietary: ["jain", "satvik"] },
+            { id: 8, nameHi: "गुलाब जामुन", nameEn: "Gulab Jamun", price: 45, meal: "dessert", dietary: ["satvik"] },
+            { id: 9, nameHi: "खीर", nameEn: "Kheer", price: 55, meal: "dessert", dietary: ["brahmacharya", "satvik"] }
+        ];
+
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        let filters = { meal: "all", dietary: "all" };
+
+        function renderFoodGrid() {
+            const filtered = foodData.filter(food => {
+                const mealMatch = filters.meal === "all" || food.meal === filters.meal;
+                const dietaryMatch = filters.dietary === "all" || food.dietary.includes(filters.dietary);
+                return mealMatch && dietaryMatch;
+            });
+
+            const grid = document.getElementById("foodGrid");
+            grid.innerHTML = filtered.map(food => `
+                <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition">
+                    <h3 class="text-lg font-bold text-gray-800">${food.nameEn}</h3>
+                    <p class="text-gray-600 text-sm mb-2">${food.nameHi}</p>
+                    <p class="text-2xl font-bold text-green-600 mb-3">₹${food.price}</p>
+                    <div class="mb-4">
+                        ${food.dietary.map(d => `<span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded mr-1 mb-1">${d}</span>`).join("")}
+                    </div>
+                    <button class="add-to-cart w-full bg-green-600 text-white py-2 rounded-lg hover:bg-green-700" data-id="${food.id}">Add to Cart</button>
+                </div>
+            `).join("");
+        }
+
+        function updateCart() {
+            localStorage.setItem("cart", JSON.stringify(cart));
+            const cartItemsDiv = document.getElementById("cartItems");
+            const cartTotal = document.getElementById("cartTotal");
+            const cartCount = document.getElementById("cartCount");
+            const orderBtn = document.getElementById("orderBtn");
+
+            if (cart.length === 0) {
+                cartItemsDiv.innerHTML = '<p class="text-gray-500">Your cart is empty</p>';
+                cartTotal.textContent = "0";
+                cartCount.textContent = "0";
+                orderBtn.disabled = true;
+                return;
+            }
+
+            let total = 0;
+            cartItemsDiv.innerHTML = cart.map(item => {
+                const food = foodData.find(f => f.id === item.id);
+                const subtotal = food.price * item.qty;
+                total += subtotal;
+                return `
+                    <div class="flex justify-between items-center py-2 border-b">
+                        <div>
+                            <p class="font-semibold text-sm">${food.nameEn}</p>
+                            <p class="text-xs text-gray-500">₹${food.price} x ${item.qty}</p>
+                        </div>
+                        <div class="flex gap-1">
+                            <button class="qty-btn bg-gray-300 px-2 py-1 rounded text-sm" data-id="${item.id}" data-action="decrease">-</button>
+                            <span class="px-2">${item.qty}</span>
+                            <button class="qty-btn bg-gray-300 px-2 py-1 rounded text-sm" data-id="${item.id}" data-action="increase">+</button>
+                        </div>
+                    </div>
+                `;
+            }).join("");
+
+            cartTotal.textContent = total;
+            cartCount.textContent = cart.reduce((sum, item) => sum + item.qty, 0);
+            orderBtn.disabled = false;
+        }
+
+        document.addEventListener("click", e => {
+            if (e.target.classList.contains("filter-btn")) {
+                document.querySelectorAll(`.filter-btn[data-filter="${e.target.dataset.filter}"]`).forEach(btn => btn.classList.remove("bg-green-600", "text-white", "border-green-600"));
+                e.target.classList.add("bg-green-600", "text-white", "border-green-600");
+                filters[e.target.dataset.filter] = e.target.dataset.value;
+                renderFoodGrid();
+            }
+
+            if (e.target.classList.contains("add-to-cart")) {
+                const id = parseInt(e.target.dataset.id);
+                const existing = cart.find(item => item.id === id);
+                if (existing) existing.qty++;
+                else cart.push({ id, qty: 1 });
+                updateCart();
+            }
+
+            if (e.target.classList.contains("qty-btn")) {
+                const id = parseInt(e.target.dataset.id);
+                const item = cart.find(i => i.id === id);
+                if (e.target.dataset.action === "increase") item.qty++;
+                else if (item.qty > 1) item.qty--;
+                else cart = cart.filter(i => i.id !== id);
+                updateCart();
+            }
+
+            if (e.target.id === "orderBtn") {
+                alert("Order placed! Total: ₹" + document.getElementById("cartTotal").textContent);
+                cart = [];
+                updateCart();
+            }
+        });
+
+        renderFoodGrid();
+        updateCart();
+    </script>
+</body>
+</html>
